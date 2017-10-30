@@ -1,0 +1,63 @@
+# http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-install.html
+
+- name: install docker
+  yum:
+    name: "docker-ce{{ docker_version|ternary('-' + docker_version, '') }}"
+    state: installed
+
+- name: Allow routing via loopback interface
+  sysctl:
+    name: net.ipv4.conf.all.route_localnet
+    value: 1
+    reload: yes
+
+- name: Add firewall rules
+  iptables:
+    table: nat
+    chain: PREROUTING
+    destination: 169.254.170.2
+    destination_port: 80
+    protocol: tcp
+    match: tcp
+    jump: DNAT
+    to_destination: 127.0.0.1:51679
+    comment: Allow IAM roles for Tasks
+
+- name: Add firewall rules
+  iptables:
+    table: nat
+    chain: OUTPUT
+    destination: 169.254.170.2
+    destination_port: 80
+    protocol: tcp
+    match: tcp
+    jump: REDIRECT
+    to_ports: 51679
+    comment: Allow IAM roles for Tasks
+
+- name: Create ECS directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /var/log/ecs
+    - /var/lib/ecs/data
+    - /etc/ecs
+
+- name: create ECS config file
+  template:
+    src: ecs.config
+    dest: /etc/ecs/ecs.config
+
+- name: create ECS unit file
+  template:
+    src: ecs.service
+    dest: /etc/systemd/system/docker-container@ecs-agent.service
+  notify: reload systemctl
+
+- meta: flush_handlers
+
+- name: ensure ECS service starts on boot
+  service:
+    name: docker-container@ecs-agent.service
+    enabled: yes

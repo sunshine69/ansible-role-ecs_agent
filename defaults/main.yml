@@ -1,0 +1,3 @@
+ecs_agent_docker_version: ''  # defaults to latest
+ecs_agent_version: latest
+
