@@ -12,6 +12,11 @@
     name: "docker-ce{{ ecs_agent_docker_version|ternary('-' + ecs_agent_docker_version, '') }}"
     state: installed
 
+- name: install docker storage dependencies
+  yum:
+    name: lvm2
+    state: installed
+
 - name: make docker configuration directory
   file:
     state: directory
