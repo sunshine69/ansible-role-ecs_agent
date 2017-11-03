@@ -1,4 +1,1 @@
-ecs_agent_docker_version: ''  # defaults to latest
 ecs_agent_version: latest
-ecs_agent_docker_storage_setup_devs: []
-ecs_agent_docker_storage_setup_vg_name: 'docker'
