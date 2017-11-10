@@ -1,3 +1,5 @@
+- include_tasks: "{{ ansible_os_family|lower }}.yml"
+
 - name: Add firewall rules
   iptables:
     table: nat
