@@ -24,6 +24,14 @@
     to_ports: 51679
     comment: Allow IAM roles for Tasks
 
+- name: save iptables (Red Hat)
+  command: service iptables save
+  when: 'ansible_os_family == "RedHat"'
+
+- name: save iptables (Debian)
+  command: netfilter-persistent save
+  when: 'ansible_os_family == "Debian"'
+
 - name: Create ECS directories
   file:
     path: "{{ item }}"
