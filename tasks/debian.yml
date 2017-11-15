@@ -1,0 +1,5 @@
+- apt:
+    name:
+      - nfs-common
+      - iptables-persistent
+    state: present

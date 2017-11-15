@@ -1,3 +1,5 @@
+- include_tasks: "{{ ansible_os_family|lower }}.yml"
+
 - name: Add firewall rules
   iptables:
     table: nat
@@ -21,6 +23,14 @@
     jump: REDIRECT
     to_ports: 51679
     comment: Allow IAM roles for Tasks
+
+- name: save iptables (Red Hat)
+  command: service iptables save
+  when: 'ansible_os_family == "RedHat"'
+
+- name: save iptables (Debian)
+  command: netfilter-persistent save
+  when: 'ansible_os_family == "Debian"'
 
 - name: Create ECS directories
   file:
