@@ -58,3 +58,8 @@
   service:
     name: docker-container@ecs-agent.service
     enabled: yes
+
+- name: Allow OS user to run docker processes
+  user:
+    name: "{{ ec2_instance_user }}"
+    groups: docker
