@@ -6,16 +6,27 @@ After=docker.service
 [Service]
 Restart=always
 ExecStart=/usr/bin/docker run --name %i \
---privileged \
---restart=on-failure:10 \
---volume=/var/run:/var/run \
---volume=/var/log/ecs/:/log:Z \
---volume=/var/lib/ecs/data:/data:Z \
---volume=/etc/ecs:/etc/ecs \
---net=host \
---env-file=/etc/ecs/ecs.config \
+  --init \
+  --restart=on-failure:10 \
+  --volume=/var/run:/var/run \
+  --volume=/var/log/ecs/:/log \
+  --volume=/var/lib/ecs/data:/data \
+  --volume=/etc/ecs:/etc/ecs \
+  --volume=/sbin:/sbin \
+  --volume=/lib:/lib \
+  --volume=/lib64:/lib64 \
+  --volume=/usr/lib:/usr/lib \
+  --volume=/proc:/host/proc \
+  --volume=/sys/fs/cgroup:/sys/fs/cgroup \
+  --volume=/var/lib/ecs/dhclient:/var/lib/dhclient \
+  --net=host \
+  --cap-add=sys_admin \
+  --cap-add=net_admin \
+  --env-file=/etc/ecs/ecs.config \
 amazon/amazon-ecs-agent:{{ ecs_agent_version }}
 ExecStop=/usr/bin/docker rm -f %i
+Restart=on-failure
+RestartPreventExitStatus=5
 
 [Install]
 WantedBy=default.target
